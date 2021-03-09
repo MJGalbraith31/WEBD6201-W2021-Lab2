@@ -1,8 +1,7 @@
-/* custom JavaScript goes here */
-
-//IIFE - Immediately Invoked Function Expression
-//AKA - Anonymous Self-Executing Function
-//Closure - limits scope leak
+/* MJ Galbraith 
+ * 100755993 
+ * Mar. 7, 2021
+ */
 
 "use strict";
 
@@ -330,15 +329,78 @@
 
     function displayRegister()
     {
+      // inserting the error message div at the top of the form 
+      $("#messageArea").after("<div id='ErrorMessage'></div>"); 
+      let errorMessage = $("#ErrorMessage"); 
+      errorMessage.hide(); 
 
-      $("#submitButton").on("click", function()
+      $("#submitButton").on("click", function(event)
       {
-        //
-        let firstName = $("#firstname"); 
+        event.preventDefault();
+
+        let firstName = $("#firstName"); 
         let lastName = $("#lastName"); 
         let emailAddress = $("#emailAddress"); 
         let password = $("#password"); 
         let confirmPassword = $("#confirmPassword"); 
+        let success = true; 
+        let error = "Error: ";
+
+        // regular expressions for validateing inputs 
+        let nameExperssion = new RegExp("^[A-Z][a-zA-Z]+$"); 
+        let emailExpression = new RegExp("^[_a-zA-Z0-9\\-]+(\.[_a-zA-Z0-9\\-]+)@[_a-zA-Z0-9\\-]+(\.[_a-zA-Z0-9\\-]+)*(\.[a-z]{2,6})$");
+        let passwordExpression = new RegExp("^[_a-zA-Z0-9-]{6,}$");
+
+        // validating the form's input fields and giving an appropriate error message 
+        if (!nameExperssion.test(firstName.val()))
+        {
+          error += "Invalid First Name";
+          success = false;
+          firstName.trigger("focus").trigger("select");
+        }
+        else if (!nameExperssion.test(lastName.val()))
+        {
+          error += "Invalid Last Name";
+          success = false;
+          lastName.trigger("focus").trigger("select");
+        }
+        else if (!emailExpression.test(emailAddress.val()))
+        {
+          error += "Invalid Email Address";
+          success = false;
+          emailAddress.trigger("focus").trigger("select");
+        }
+        else if (!passwordExpression.test(password.val()))
+        {
+          error += "Invalid Password"
+          success = false;
+          password.trigger("focus").trigger("select");
+        }
+        else if (password.val() != confirmPassword.val())
+        {
+          error += "Passwords Need to Match";
+          success = false;
+          password.trigger("focus").trigger("select");
+        }
+
+        if (success)
+        {
+          // creating the User object 
+          let displayName = firstName.val() + " " + lastName.val();
+          let userName = firstName.val().toLocaleLowerCase() + lastName.val().toLocaleLowerCase();
+          let newUser = new core.User(displayName, emailAddress.val(), userName, password.val());
+
+          // printing the created User object to the console 
+          console.log(newUser.serialize());
+
+          // clearing the form 
+          document.forms[0].reset();
+        }
+        else
+        {
+          // showing the error message 
+          errorMessage.show().addClass("alert alert-danger").text(error);
+        }
       });
 
     }
